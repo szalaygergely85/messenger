@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class StartActivity extends AppCompatActivity {
     Button buttonlog;
     @Override
@@ -21,6 +23,17 @@ public class StartActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (FirebaseAuth.getInstance().getUid()!=null){
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+        }
+    }
+
     public void register(android.view.View source){
         startActivity(new Intent(this, RegisterActivity.class));
         finish();

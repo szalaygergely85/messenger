@@ -15,23 +15,29 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
     private EditText email=null;
     private EditText pass=null;
     private Button register = null;
     private FirebaseAuth auth;
-
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        email = findViewById(R.id.text_email2);
-        pass = findViewById(R.id.text_pass2);
+        email = findViewById(R.id.text_email);
+        pass = findViewById(R.id.text_pass);
         register = findViewById(R.id.button_register);
 
         auth = FirebaseAuth.getInstance();
+        db= FirebaseFirestore.getInstance();
+
         //TODO more fields
         register.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,6 +62,11 @@ public class RegisterActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
                     Toast.makeText(RegisterActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                    Map<String, Object> user= new HashMap<>();
+                    user.put("email",text_email);
+
+                    db.collection("users").document(text_email).set(user);
+
                     startActivity(new Intent(RegisterActivity.this, StartActivity.class));
                     finish();
                 }else {
