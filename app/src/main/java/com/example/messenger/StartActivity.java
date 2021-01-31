@@ -28,7 +28,7 @@ public class StartActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        if (FirebaseAuth.getInstance().getUid()!=null){
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
         }
