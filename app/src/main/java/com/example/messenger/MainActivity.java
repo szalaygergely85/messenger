@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,14 +61,20 @@ public class MainActivity extends AppCompatActivity {
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Date date = new Date();
+                //This method returns the time in millis
+                long timeMilli = date.getTime();
                 String txt_mess = mess.getText().toString();
                 Map<String, Object> message = new HashMap<>();
                 message.put("to", TO);
                 message.put("from", fh.getUid().toString());
                 message.put("message", txt_mess);
+                message.put("time", timeMilli);
+                message.put("unread", true);
+
                 Log.d("messagetosend", TO + " " + fh.getUid().toString() + " " + txt_mess);
-                db2.collection("messages").document(TO).set(message);
+                db2.collection(TO).document("" + timeMilli).set(message);
+                mess.setText("");
 
 
             }

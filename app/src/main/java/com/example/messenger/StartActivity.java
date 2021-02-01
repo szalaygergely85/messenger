@@ -29,7 +29,7 @@ public class StartActivity extends AppCompatActivity {
         super.onStart();
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, MessagesActivity.class));
             finish();
         }
     }

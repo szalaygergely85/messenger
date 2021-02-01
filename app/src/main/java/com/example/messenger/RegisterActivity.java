@@ -38,7 +38,6 @@ public class RegisterActivity extends AppCompatActivity {
         register = findViewById(R.id.button_register);
 
 
-        //TODO more fields
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
