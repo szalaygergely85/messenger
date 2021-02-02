@@ -3,12 +3,16 @@ package com.example.messenger;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -47,15 +51,15 @@ public class MessagesActivity extends AppCompatActivity {
         SQLiteDatabase mydatabase = openOrCreateDatabase("MESSENGER", MODE_PRIVATE, null);
         // mydatabase.execSQL("DROP TABLE MyContacts");
         // mydatabase.execSQL("DROP TABLE Messages");
-        mydatabase.execSQL("CREATE TABLE IF NOT EXISTS MyContacts(Userid VARCHAR, Username VARCHAR);");
-        mydatabase.execSQL("CREATE TABLE IF NOT EXISTS Messages(Messageid INT, Fr VARCHAR, Text VARCHAR);");
+        // mydatabase.execSQL("CREATE TABLE IF NOT EXISTS MyContacts(Userid VARCHAR, Username VARCHAR);");
+        //   mydatabase.execSQL("CREATE TABLE IF NOT EXISTS Messages(Messageid INT, Fr VARCHAR, Text VARCHAR);");
 
 
         db = FirebaseFirestore.getInstance();
         fh = FirebaseAuth.getInstance();
 
 
-        db.collection(fh.getUid()).whereEqualTo("unread", true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+       /* db.collection(fh.getUid()).whereEqualTo("unread", true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
@@ -94,10 +98,10 @@ public class MessagesActivity extends AppCompatActivity {
                     Log.d("jolesz", "Error getting documents: ", task.getException());
                 }
             }
-        });
+        });*/
 
         Cursor resultSet2 = mydatabase.rawQuery("Select Messages.Text, MyContacts.Userid from Messages, MyContacts where Messages.Messageid=(Select MAX(Messages.Messageid) from Messages Where Messages.Fr=(Select distinct MyContacts.Userid FROM MyContacts))", null);
-        Log.d("jolesz", "" + resultSet2.getCount());
+        Log.d("ezzzz", "" + resultSet2.getCount());
 
         contactsInfoList = new ArrayList<MessageHead>();
         if (resultSet2.moveToFirst()) {
@@ -110,6 +114,14 @@ public class MessagesActivity extends AppCompatActivity {
             } while (resultSet2.moveToNext());
             dataAdapter = new MessagesListAdapter(MessagesActivity.this, R.layout.listview_messages, contactsInfoList);
             listView.setAdapter(dataAdapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    MessageHead Contact = new MessageHead();
+                    Contact = (MessageHead) parent.getItemAtPosition(position);
+                    startActivity(new Intent(MessagesActivity.this, MainActivity.class));
+                }
+            });
         }
 
 

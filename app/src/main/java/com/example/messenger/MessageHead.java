@@ -16,6 +16,9 @@ public class MessageHead {
         Sender = M.Sender;
     }
 
+    public MessageHead() {
+    }
+
     public String getText() {
         return Text;
     }
