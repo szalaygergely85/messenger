@@ -1,25 +1,14 @@
 package com.example.messenger;
 
-import java.io.Serializable;
-
-public class MessageHead implements Serializable {
-
+public class Chat {
     private String Text;
     private String Sender;
+    private String Time;
 
-    public MessageHead(String text, String sender) {
+    public Chat(String text, String sender, String time) {
         Text = text;
         Sender = sender;
-    }
-
-
-
-    public MessageHead(MessageHead M) {
-        Text = M.Text;
-        Sender = M.Sender;
-    }
-
-    public MessageHead() {
+        Time = time;
     }
 
     public String getText() {
@@ -36,6 +25,14 @@ public class MessageHead implements Serializable {
 
     public void setSender(String sender) {
         Sender = sender;
+    }
+
+    public String getTime() {
+        return Time;
+    }
+
+    public void setTime(String time) {
+        Time = time;
     }
 
 

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
@@ -20,6 +21,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -76,25 +79,13 @@ public class RegisterActivity2 extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
+                    auth.signInWithEmailAndPassword(text_email, text_pass);
                     Toast.makeText(RegisterActivity2.this, "Success", Toast.LENGTH_SHORT).show();
                     Map<String, Object> user = new HashMap<>();
                     user.put("email", text_email);
                     user.put("name", name);
                     user.put("phone", phone);
-
-//TODO Add user ID
-                    /*
-                    db.collection("users").endAt().get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                String userID = document.get("userid").toString();
-                            }
-                        }
-                    })
-
-                    user.put("userid", ); */
+                    user.put("userid", auth.getUid());
                     Log.d("phone", "" + phone);
                     db.collection("users").document(text_email).set(user);
 

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ChatActivity">
 
     <Button
         android:id="@+id/logout"
@@ -38,6 +38,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <ListView
+        android:id="@+id/listview_chat"
         android:layout_width="417dp"
         android:layout_height="637dp"
         android:layout_marginBottom="10dp"

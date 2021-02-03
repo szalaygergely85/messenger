@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -29,7 +30,7 @@ public class StartActivity extends AppCompatActivity {
     FirebaseFirestore db;
     private Intent intent;
     private SQLiteDatabase mydatabase;
-    User user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +40,9 @@ public class StartActivity extends AppCompatActivity {
         //Create or open SQL database and tables
         mydatabase = openOrCreateDatabase("MESSENGER", MODE_PRIVATE, null);
         // mydatabase.execSQL("DROP TABLE MyContacts");
-        // mydatabase.execSQL("DROP TABLE Messages");
+        //  mydatabase.execSQL("DROP TABLE Messages");
         mydatabase.execSQL("CREATE TABLE IF NOT EXISTS MyContacts(Userid VARCHAR, Username VARCHAR);");
-        mydatabase.execSQL("CREATE TABLE IF NOT EXISTS Messages(Messageid INT, Fr VARCHAR, Text VARCHAR);");
+        mydatabase.execSQL("CREATE TABLE IF NOT EXISTS Messages(Messageid INT, Fr VARCHAR, ToID VARCHAR, FRName VARCHAR, Text VARCHAR, Read BOOLEAN);");
 
         fh = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -58,26 +59,36 @@ public class StartActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        fh = FirebaseAuth.getInstance();
 
-        if (fh.getCurrentUser() != null) {
-            FirebaseUser user = fh.getCurrentUser();
+        db = FirebaseFirestore.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
+        if (user != null) {
+
+            Log.d("User", fh.getCurrentUser().getDisplayName());
             db.collection("users").document(user.getEmail()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+
+                    User userclass = new User(documentSnapshot.get("userid").toString(), documentSnapshot.get("name").toString());
+
+
                     intent = new Intent(StartActivity.this, MessagesActivity.class);
-                    intent.putExtra("user", user);
-                    User currentuser = new User(documentSnapshot.get("email").toString(), documentSnapshot.get("name").toString(), documentSnapshot.get("userid").toString());
+                    intent.putExtra("userclass", userclass);
 
 
                     new Thread() {
                         @Override
                         public void run() {
-                            checkmessage(currentuser);
+                            Log.d("Useremail", userclass.getName());
+                            checkmessage();
+
                         }
                     }.start();
 
-                    Log.d("Useremail", currentuser.getEmail());
+                    Log.d("Useremail", fh.getCurrentUser().getEmail());
                     startActivity(intent);
                     finish();
                 }
@@ -92,10 +103,10 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
-    public void checkmessage(User user) {
+    public void checkmessage() {
         while (true) {
-            Log.d("User", fh.getCurrentUser().getUid());
-            db.collection(fh.getCurrentUser().getUid()).whereEqualTo("unread", true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            Log.d("Useremail", "userclass.getName()");
+            db.collection(fh.getCurrentUser().getUid()).whereEqualTo("downloaded", false).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
@@ -104,16 +115,18 @@ public class StartActivity extends AppCompatActivity {
                             // write message to the database
                             String messa = document.get("message").toString();
                             String fr = document.get("from").toString();
+                            String frN = document.get("fromName").toString();
+                            String To = document.get("to").toString();
                             String tim = document.get("time").toString();
                             Log.d("jolesz", fr);
-                            mydatabase.execSQL("INSERT INTO Messages  VALUES(" + tim + ", '" + fr + "', '" + messa + "');");
-                            db.collection(fh.getCurrentUser().getUid()).document(tim).update("unread", false);
+                            mydatabase.execSQL("INSERT INTO Messages  VALUES(" + tim + ", '" + fr + "', '" + To + "' , '" + frN + "' , '" + messa + "', 'false');");
+                            db.collection(fh.getCurrentUser().getUid()).document(tim).update("downloaded", true);
                             //check the user out
                             Cursor resultSet = mydatabase.rawQuery("Select * from MyContacts where Userid ='" + fr + "'", null);
 
                             Log.d("jolesz", "" + resultSet.getCount());
                             if (resultSet.getCount() == 0) {
-                                mydatabase.execSQL("INSERT INTO MyContacts VALUES('" + user.getId() + "', '" + user.getName() + "');");
+                                mydatabase.execSQL("INSERT INTO MyContacts VALUES('" + fr + "', '" + frN + "');");
                             }
                         }
                     } else {
@@ -125,7 +138,7 @@ public class StartActivity extends AppCompatActivity {
 
             Log.d("Hello", "Hello from the thread");
             try {
-                Thread.sleep(30000);
+                Thread.sleep(60000);
             } catch (InterruptedException e) {
 
             }

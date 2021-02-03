@@ -13,7 +13,7 @@
         android:theme="@style/Theme.Messenger">
         <activity android:name=".MessagesActivity"></activity>
         <activity android:name=".RegisterActivity2" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".ChatActivity" />
         <activity android:name=".loginActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".StartActivity">
