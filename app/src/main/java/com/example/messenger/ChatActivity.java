@@ -27,13 +27,13 @@ public class ChatActivity extends AppCompatActivity {
     private EditText mess;
     private FirebaseFirestore db2;
     private FirebaseAuth fh;
-    private static String TO;
+    private String TO;
     private User userclass;
     private MessageHead messageHead;
     private SQLiteDatabase mydatabase;
-    ChatListAdapter dataAdapter = null;
-    ListView listView;
-    List<Chat> chatInfoList;
+    private ChatListAdapter dataAdapter = null;
+    private ListView listView;
+    private List<Chat> chatInfoList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +50,16 @@ public class ChatActivity extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.listview_chat);
         listView.setAdapter(dataAdapter);
-        Cursor resultSet2 = mydatabase.rawQuery("Select Messages.Fr, Messages.Text, Messages.Messageid from Messages Where Messages.Fr='" + messageHead.getSender() + "'", null);
+
+        Cursor resultSet2 = mydatabase.rawQuery("Select Messages.Fr, Messages.Text, Messages.Messageid from Messages Where Messages.Fr='" + messageHead.getUserID() + "' OR Messages.ToID='" + messageHead.getUserID() + "'", null);
+
         chatInfoList = new ArrayList<Chat>();
         if (resultSet2.moveToFirst()) {
             do {
                 String User = resultSet2.getString(0);
                 String messaget = resultSet2.getString(1);
                 String time = resultSet2.getString(2);
+                Log.d("jolesz", User);
                 Chat messageh = new Chat(messaget, User, time);
                 chatInfoList.add(messageh);
 
@@ -69,7 +72,7 @@ public class ChatActivity extends AppCompatActivity {
         //Send message PART
 
 
-        ;
+
 
         TO = messageHead.getSender();
         Log.d("Userclass", userclass.getName());
@@ -99,19 +102,20 @@ public class ChatActivity extends AppCompatActivity {
                 long timeMilli = date.getTime();
                 String txt_mess = mess.getText().toString();
                 Map<String, Object> message = new HashMap<>();
-                message.put("to", TO);
+                message.put("to", messageHead.getUserID());
                 message.put("from", userclass.getId());
-                message.put("fromName", userclass.getName());
+                message.put("fromName", TO);
                 message.put("message", txt_mess);
                 message.put("time", timeMilli);
                 message.put("downloaded", false);
                 message.put("unread", true);
 
-                Log.d("messagetosend", TO + " " + fh.getUid().toString() + " " + txt_mess);
+                Log.d("messagetosend", messageHead.getUserID() + " " + fh.getUid().toString() + " " + txt_mess);
 
 
-                mydatabase.execSQL("INSERT INTO Messages  VALUES(" + timeMilli + ", '" + userclass.getId() + "', '" + TO + "' ,'" + userclass.getName() + "' , '" + txt_mess + "', 'false');");
-                db2.collection(TO).document("" + timeMilli).set(message);
+                mydatabase.execSQL("INSERT INTO Messages  VALUES(" + timeMilli + ", '" + userclass.getId() + "', '" + messageHead.getUserID() + "' ,'" + userclass.getName() + "' , '" + txt_mess + "', 'true');");
+
+                db2.collection(messageHead.getUserID()).document("" + timeMilli).set(message);
                 mess.setText("");
 
 

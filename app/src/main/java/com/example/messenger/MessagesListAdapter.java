@@ -1,6 +1,7 @@
 package com.example.messenger;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ public class MessagesListAdapter extends ArrayAdapter {
         }
 
         MessageHead contactsInfo = (MessageHead) messagesInfoList.get(position);
+        holder.messageText.setTypeface(null, Typeface.BOLD);
         holder.messageText.setText(contactsInfo.getText());
         holder.senderName.setText(contactsInfo.getSender());
 

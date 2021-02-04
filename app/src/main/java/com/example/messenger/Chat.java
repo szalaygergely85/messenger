@@ -5,6 +5,7 @@ public class Chat {
     private String Sender;
     private String Time;
 
+
     public Chat(String text, String sender, String time) {
         Text = text;
         Sender = sender;
